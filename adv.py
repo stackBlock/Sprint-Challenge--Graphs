@@ -1,4 +1,4 @@
-from room import Room
+# from room import Room
 from player import Player
 from world import World
 
@@ -23,12 +23,41 @@ world.load_graph(room_graph)
 # Print an ASCII map
 world.print_rooms()
 
+
+
+############ CODE BEGIN
+
+
 player = Player(world.starting_room)
 
-# Fill this out with directions to walk
-# traversal_path = ['n', 'n']
 traversal_path = []
+visited = {}
+t_around = []
+b_track = {'n': 's', 'e': 'w', 's': 'n', 'w': 'e'}
 
+visited[player.current_room.id] = player.current_room.get_exits()   #add fst room and exits
+
+while len(visited) < len(room_graph):                               # visited is less then length of rooms
+    if player.current_room.id not in visited:                       # not visited
+        visited[player.current_room.id] = player.current_room.get_exits() # add room and exits
+        previous_direction = t_around[-1]                           # turn around
+        visited[player.current_room.id].remove(previous_direction)  # remove from unexplored rooms
+
+    if len(visited[player.current_room.id]) == 0:                   # if 0 all paths were examined in room(area)
+        previous_direction = t_around[-1]                           # go back until new room found and assign
+        t_around.pop()                                              # pop of room
+        traversal_path.append(previous_direction)                   # add to the traverses path
+        player.travel(previous_direction)                           # travel in that direction
+
+    else:                                                           # explore new direction
+        direction = visited[player.current_room.id][-1]             # go in the first direction found
+        visited[player.current_room.id].pop()                       # pop from list
+        traversal_path.append(direction)                            # add direction
+        t_around.append(b_track[direction])                         # record opposite direction to t_around
+        player.travel(direction)                                    # go in that
+
+
+############## CODE END
 
 
 # TRAVERSAL TEST - DO NOT MODIFY
